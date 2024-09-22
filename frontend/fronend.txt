@@ -1,2 +1,0 @@
-frontend tools are : 
-HTML , Css , Js , Bootstrap , tailwind
