@@ -124,6 +124,85 @@ app.use(session({
 })();
 
 
+const createtoken = (req, res, rows) => {
+    const username = rows[0].username; // Get username from the returned rows
+    const token = jwt.sign({ username: username }, JWT_SECRET, {
+        expiresIn: JWT_EXPIRY,
+    });
+    req.session.jwtToken = token;
+
+    // Return the token
+    return token;
+};
+
+
+const authenticateToken = (req, res, next) => {
+    try {
+
+        if (!req.headers.authorization) {
+            return res.redirect('#');
+        }
+
+        const token = req.headers.authorization.split(' ')[1];
+
+        jwt.verify(token, JWT_SECRET, (err, decoded) => {
+            if (err) {
+                console.error('Authentication error:', err.message);
+
+                return res.status(401).json({ error: 'Unauthorized' });
+            } else {
+                req.user = decoded;
+                next();
+            }
+        });
+    } catch (err) {
+        console.error('Error in authentication middleware:', err.message);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
+app.post('/api/decodeToken', [authenticateToken, async(req, res) => {
+    console.log('API decode requested');
+    try {
+        const { token } = req.body;
+
+        const decodedToken = jwt.verify(token, JWT_SECRET);
+
+        const { username } = decodedToken; // Get username from the decoded token
+
+        if (!username) {
+            return res.status(400).json({ error: 'username not found in token' });
+        }
+
+        const connection = await pool.getConnection();
+
+        try {
+            // Use the specified query to retrieve username and u_id
+            const [rows] = await connection.execute(
+                'SELECT username, u_id FROM login WHERE username = ?', [username]
+            );
+
+            if (rows.length === 0) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            const userData = rows[0];
+
+            // Send response with username and u_id
+            res.status(200).json(userData);
+        } catch (error) {
+            console.error('Error querying database:', error.message);
+            res.status(500).json({ error: 'Internal server error' });
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error decoding token:', error.message);
+        res.status(400).json({ error: 'Failed to decode token' });
+    }
+}]);
+
 
 
 // Route for user registration
@@ -152,6 +231,45 @@ app.post('/api/register', async(req, res) => {
         res.json({ success: true, message: 'User registered successfully' });
     } catch (error) {
         console.error('Error during registration:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+
+// Route for login
+app.post('/api/login', async(req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        console.log('API login requested');
+
+        // Query the database to check if the provided username exists in the login table
+        const [existingUser] = await pool.execute('SELECT * FROM login WHERE username = ?', [username]);
+
+        if (existingUser.length === 0) {
+            // If the username doesn't exist in the login table, return an error
+            console.log("No user found");
+            return res.status(400).json({ error: 'Invalid username' });
+        }
+
+        // Verify the password
+        const isPasswordValid = await bcrypt.compare(password, existingUser[0].password);
+
+        if (!isPasswordValid) {
+            // If the password is incorrect, return an error
+            console.log("Invalid password");
+            return res.status(400).json({ error: 'Invalid password' });
+        }
+
+        // Call function to create token
+        const token = createtoken(req, res, existingUser);
+        console.log("Token:", token);
+
+        // Send response
+        res.json({ isValid: true, token });
+    } catch (error) {
+        console.error('Error during login:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
