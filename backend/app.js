@@ -65,6 +65,7 @@ const KEYFILEPATH = path.join(__dirname, "cred.json");
 const SCOPES = ["https://www.googleapis.com/auth/drive"];
 
 
+
 const auth = new google.auth.GoogleAuth({
     keyFile: KEYFILEPATH,
     scopes: SCOPES,
@@ -125,6 +126,275 @@ app.use(session({
 
 
 
+// Route for user registration
+app.post('/api/register', async(req, res) => {
+    // Get and convert username to lowercase
+    const { username, password } = req.body;
+    const normalizedUsername = username.toLowerCase(); // Convert username to lowercase
+
+    try {
+        console.log('API registration requested');
+
+        // Check if the username already exists (case-insensitive check)
+        const [existingUser] = await pool.execute('SELECT * FROM login WHERE username = ?', [normalizedUsername]);
+        if (existingUser.length > 0) {
+            console.log('User with the same username already exists');
+            return res.status(400).json({ error: 'User with the same username already exists' });
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Insert new user into the login table
+        const loginResult = await pool.execute('INSERT INTO login (username, password, is_active) VALUES (?, ?, ?)', [normalizedUsername, hashedPassword, 1]);
+
+        // Send response
+        res.json({ success: true, message: 'User registered successfully' });
+    } catch (error) {
+        console.error('Error during registration:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+
+// Route for creating Level 1 entry
+app.post('/api/level1', async(req, res) => {
+    const { name, description, img } = req.body;
+
+    try {
+        console.log('API Level 1 creation requested');
+
+        // Validate the request body
+        if (!name) {
+            return res.status(400).json({ error: 'Name is required' });
+        }
+
+        // Insert new entry into the level1 table
+        const result = await pool.execute(
+            'INSERT INTO level1 (name, description, img) VALUES (?, ?, ?)', [name, description || null, img || null] // Use null if description or img is not provided
+        );
+
+        // Send response
+        res.json({ success: true, message: 'Level 1 entry created successfully', id: result.insertId });
+    } catch (error) {
+        console.error('Error during Level 1 creation:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+// Route for creating Level 2 entry
+app.post('/api/level2', async(req, res) => {
+    const { p_id, name, description, img } = req.body;
+
+    try {
+        console.log('API Level 2 creation requested');
+
+        // Validate the request body
+        if (!p_id || !name) {
+            return res.status(400).json({ error: 'p_id and name are required' });
+        }
+
+        // Insert new entry into the level2 table
+        const result = await pool.execute(
+            'INSERT INTO level2 (p_id, name, description, img) VALUES (?, ?, ?, ?)', [p_id, name, description || null, img || null] // Use null if description or img is not provided
+        );
+
+        // Send response
+        res.json({ success: true, message: 'Level 2 entry created successfully', id: result.insertId });
+    } catch (error) {
+        console.error('Error during Level 2 creation:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+
+// Route for creating Level 3 entry
+app.post('/api/level3', async(req, res) => {
+    const { p_id, name, description, img } = req.body;
+
+    try {
+        console.log('API Level 3 creation requested');
+
+        if (!p_id || !name) {
+            return res.status(400).json({ error: 'p_id and name are required' });
+        }
+
+        const result = await pool.execute(
+            'INSERT INTO level3 (p_id, name, description, img) VALUES (?, ?, ?, ?)', [p_id, name, description || null, img || null]
+        );
+
+        res.json({ success: true, message: 'Level 3 entry created successfully', id: result.insertId });
+    } catch (error) {
+        console.error('Error during Level 3 creation:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+
+// Route for creating Level 4 entry
+app.post('/api/level4', async(req, res) => {
+    const { p_id, name, description, img } = req.body;
+
+    try {
+        console.log('API Level 4 creation requested');
+
+        if (!p_id || !name) {
+            return res.status(400).json({ error: 'p_id and name are required' });
+        }
+
+        const result = await pool.execute(
+            'INSERT INTO level4 (p_id, name, description, img) VALUES (?, ?, ?, ?)', [p_id, name, description || null, img || null]
+        );
+
+        res.json({ success: true, message: 'Level 4 entry created successfully', id: result.insertId });
+    } catch (error) {
+        console.error('Error during Level 4 creation:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+// Route for creating Level 5 entry
+app.post('/api/level5', async(req, res) => {
+    const { p_id, name, description, img } = req.body;
+
+    try {
+        console.log('API Level 5 creation requested');
+
+        if (!p_id || !name) {
+            return res.status(400).json({ error: 'p_id and name are required' });
+        }
+
+        const result = await pool.execute(
+            'INSERT INTO level5 (p_id, name, description, img) VALUES (?, ?, ?, ?)', [p_id, name, description || null, img || null]
+        );
+
+        res.json({ success: true, message: 'Level 5 entry created successfully', id: result.insertId });
+    } catch (error) {
+        console.error('Error during Level 5 creation:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+// Route for creating Level 6 entry
+app.post('/api/level6', async(req, res) => {
+    const { p_id, name, description, img } = req.body;
+
+    try {
+        console.log('API Level 6 creation requested');
+
+        if (!p_id || !name) {
+            return res.status(400).json({ error: 'p_id and name are required' });
+        }
+
+        const result = await pool.execute(
+            'INSERT INTO level6 (p_id, name, description, img) VALUES (?, ?, ?, ?)', [p_id, name, description || null, img || null]
+        );
+
+        res.json({ success: true, message: 'Level 6 entry created successfully', id: result.insertId });
+    } catch (error) {
+        console.error('Error during Level 6 creation:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+// Route for creating Level 7 entry
+app.post('/api/level7', async(req, res) => {
+    const { p_id, name, description, img } = req.body;
+
+    try {
+        console.log('API Level 7 creation requested');
+
+        if (!p_id || !name) {
+            return res.status(400).json({ error: 'p_id and name are required' });
+        }
+
+        const result = await pool.execute(
+            'INSERT INTO level7 (p_id, name, description, img) VALUES (?, ?, ?, ?)', [p_id, name, description || null, img || null]
+        );
+
+        res.json({ success: true, message: 'Level 7 entry created successfully', id: result.insertId });
+    } catch (error) {
+        console.error('Error during Level 7 creation:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+// Route for creating Level 8 entry
+app.post('/api/level8', async(req, res) => {
+    const { p_id, name, description, img } = req.body;
+
+    try {
+        console.log('API Level 8 creation requested');
+
+        if (!p_id || !name) {
+            return res.status(400).json({ error: 'p_id and name are required' });
+        }
+
+        const result = await pool.execute(
+            'INSERT INTO level8 (p_id, name, description, img) VALUES (?, ?, ?, ?)', [p_id, name, description || null, img || null]
+        );
+
+        res.json({ success: true, message: 'Level 8 entry created successfully', id: result.insertId });
+    } catch (error) {
+        console.error('Error during Level 8 creation:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+
+// Route for creating Level 9 entry
+app.post('/api/level9', async(req, res) => {
+    const { p_id, name, description, img } = req.body;
+
+    try {
+        console.log('API Level 9 creation requested');
+
+        if (!p_id || !name) {
+            return res.status(400).json({ error: 'p_id and name are required' });
+        }
+
+        const result = await pool.execute(
+            'INSERT INTO level9 (p_id, name, description, img) VALUES (?, ?, ?, ?)', [p_id, name, description || null, img || null]
+        );
+
+        res.json({ success: true, message: 'Level 9 entry created successfully', id: result.insertId });
+    } catch (error) {
+        console.error('Error during Level 9 creation:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+// Route for creating Level 10 entry
+app.post('/api/level10', async(req, res) => {
+    const { p_id, name, description, img } = req.body;
+
+    try {
+        console.log('API Level 10 creation requested');
+
+        if (!p_id || !name) {
+            return res.status(400).json({ error: 'p_id and name are required' });
+        }
+
+        const result = await pool.execute(
+            'INSERT INTO level10 (p_id, name, description, img) VALUES (?, ?, ?, ?)', [p_id, name, description || null, img || null]
+        );
+
+        res.json({ success: true, message: 'Level 10 entry created successfully', id: result.insertId });
+    } catch (error) {
+        console.error('Error during Level 10 creation:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 
 
