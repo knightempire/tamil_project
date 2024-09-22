@@ -7,10 +7,10 @@ A group of Tamil students from Amrita University, batch of CSE 2025 pass-out stu
 <p>
     <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="50" height="50" />
     <img src="https://www.mysql.com/common/logos/logo-mysql-170x115.png" alt="MySQL" width="50" height="50" />
-    <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/HTML5_logo_and_wordmark.svg" alt="HTML" width="50" height="50" />
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/62/CSS3_logo_and_wordmark.svg" alt="CSS" width="50" height="50" />
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/JavaScript-logo.png" alt="JavaScript" width="50" height="50" />
-    <img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Tailwind_CSS_Logo.svg" alt="Tailwind CSS" width="50" height="50" />
+    <img src="https://img.icons8.com/color/48/000000/html-5.png" title="HTML" alt="HTML" />
+    <img src="https://img.icons8.com/color/48/000000/css3.png" title="CSS" alt="CSS" />
+    <img src="https://img.icons8.com/color/48/000000/javascript.png" title="JavaScript" alt="JavaScript" />
+    <img src="https://img.icons8.com/color/48/000000/tailwindcss.png" title="Tailwind CSS" alt="Tailwind CSS" />
     <img src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" alt="Bootstrap" width="50" height="50" />
 </p>
 
