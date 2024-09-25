@@ -4,13 +4,15 @@
 A group of Tamil students from Amrita University, batch of CSE 2025 pass-out students, are currently in the process of cooking something spicy. 
 
 ## Tools
-- **Node.js** ![Node.js Icon](https://iconarchive.com/download/i105550/Flat-Icon-Set/Node-js-Logo.ico)
-- **MySQL** ![MySQL Icon](https://iconarchive.com/download/i108572/Flat-Icon-Set/MySQL.ico)
-- **HTML** ![HTML Icon](https://iconarchive.com/download/i107183/Flat-Icon-Set/HTML-5.ico)
-- **CSS** ![CSS Icon](https://iconarchive.com/download/i107186/Flat-Icon-Set/CSS-3.ico)
-- **JavaScript** ![JavaScript Icon](https://iconarchive.com/download/i107186/Flat-Icon-Set/JavaScript.ico)
-- **Tailwind CSS** ![Tailwind CSS Icon](https://iconarchive.com/download/i116772/Flat-Icon-Set/Tailwind-css-Logo.ico)
-- **Bootstrap** ![Bootstrap Icon](https://iconarchive.com/download/i107187/Flat-Icon-Set/Bootstrap-Logo.ico)
+<p>
+    <img src="https://nodejs.org/static/images/logo.svg" alt="Node.js" width="50" height="50" />
+    <img src="https://www.mysql.com/common/logos/logo-mysql-170x115.png" alt="MySQL" width="50" height="50" />
+    <img src="https://img.icons8.com/color/48/000000/html-5.png" title="HTML" alt="HTML" />
+    <img src="https://img.icons8.com/color/48/000000/css3.png" title="CSS" alt="CSS" />
+    <img src="https://img.icons8.com/color/48/000000/javascript.png" title="JavaScript" alt="JavaScript" />
+    <img src="https://img.icons8.com/color/48/000000/tailwindcss.png" title="Tailwind CSS" alt="Tailwind CSS" />
+    <img src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" alt="Bootstrap" width="50" height="50" />
+</p>
 
 ## Database Design
 ![Database Design](https://i.imgur.com/KmL5zqy.png)
