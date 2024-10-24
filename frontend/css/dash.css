@@ -125,3 +125,65 @@ h1 {
     content: '';
     border-color: #94a0b4;
 }
+
+
+/* new update */
+
+
+/* Centering and layout adjustments */
+
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.top-right-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.tree-options {
+    text-decoration: underline;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.tree {
+    display: none;
+}
+
+ul {
+    list-style-type: none;
+}
+
+.nav ul ul {
+    display: none;
+}
+
+.nav a {
+    text-decoration: none;
+    display: block;
+    padding: 5px;
+}
+
+.nav a:hover {
+    background-color: #ddd;
+}
+
+.expanded>ul {
+    display: block;
+}
+
+
+/* Custom styles for form alignment */
+
+.form-container {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    width: 300px;
+    /* Set a fixed width for the form */
+}
