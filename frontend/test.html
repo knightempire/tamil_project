@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tamil Project - Mind Map</title>
+    <link href='https://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .tree-container {
+            position: relative;
+            margin: 20px;
+            text-align: center;
+        }
+        
+        .tree-node {
+            position: relative;
+            display: inline-block;
+            margin: 20px;
+            text-align: center;
+        }
+        
+        .tree-node a {
+            padding: 10px 15px;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            color: #007bff;
+            text-decoration: none;
+        }
+        
+        .tree-node a:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .connection-line {
+            position: absolute;
+            background: #007bff;
+            z-index: -1;
+        }
+        
+        .vertical-line {
+            width: 2px;
+        }
+        
+        .horizontal-line {
+            height: 2px;
+        }
+        
+        .top-right-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .distree {
+            margin-top: 50px;
+            text-align: center;
+        }
+        
+        #selectedTree {
+            display: inline-block;
+            position: relative;
+            margin-top: 20px;
+        }
+        
+        .parent-node {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: inline-block;
+            /* Ensure parent node does not occupy full width */
+        }
+        
+        .child-nodes-container {
+            display: flex;
+            /* Use flexbox for child nodes layout */
+            justify-content: center;
+            /* Center child nodes */
+            flex-wrap: wrap;
+            /* Allow wrapping if needed */
+        }
+        
+        .child-node {
+            display: inline-block;
+            /* Align child nodes in a row */
+            margin: 10px 20px;
+            /* Space between child nodes */
+            position: relative;
+            /* Required for connection lines */
+            text-align: center;
+            /* Center text in child nodes */
+        }
+        
+        .form-container {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            width: 250px;
+            z-index: 1000;
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        #routeNodeInput {
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="text-center">Mind Map of Nodes</h1>
+
+    <div class="main">
+        <div class="displaytrees tree-container"></div>
+    </div>
+
+    <button id="addRouteNode" class="top-right-button btn btn-primary">Add Route Node</button>
+
+    <div id="dropdownInput" class="dropdown-input form-container" style="display: none;">
+        <form id="routeNodeForm" class="bg-light p-2 border rounded">
+            <h5 class="mb-2">Add Route Node</h5>
+            <div class="form-group">
+                <label for="parentNodeInput">Parent Node:</label>
+                <input type="text" class="form-control form-control-sm" id="parentNodeInput" name="parentNodeInput" value="new parent" readonly>
+            </div>
+            <div class="form-group">
+                <label for="routeNodeInput">Enter Route Node:</label>
+                <input type="text" class="form-control form-control-sm" id="routeNodeInput" name="routeNodeInput" placeholder="Route Node" required>
+            </div>
+            <button type="submit" class="btn btn-success btn-block btn-sm">Submit</button>
+        </form>
+    </div>
+
+    <div class="distree">
+        <h1>trees</h1>
+        <div id="selectedTree"></div>
+    </div>
+
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+
+</body>
+
+</html>
+
+
+
+<style>
+    .tree-node {
+        position: relative;
+        display: inline-block;
+        margin: 20px;
+    }
+    
+    .child-nodes-container {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+        /* Increased margin to add space between Level 2 nodes */
+    }
+    
+    .level3-nodes-container,
+    .level4-nodes-container,
+    .level5-nodes-container,
+    .level6-nodes-container,
+    .level7-nodes-container,
+    .level8-nodes-container,
+    .level9-nodes-container,
+    .level10-nodes-container {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+        /* Increased margin to add space between Level 3 nodes */
+    }
+    
+    .connection-line {
+        position: absolute;
+        background: black;
+    }
+    
+    .vertical-line {
+        width: 2px;
+    }
+    
+    .horizontal-line {
+        height: 2px;
+    }
+    /* Additional styles for spacing */
+    
+    .child-node {
+        margin-top: 40px;
+        /* More space between Level 2 and parent */
+        padding-left: 10px;
+        /* Add padding to avoid text being too close */
+    }
+    
+    .level3-node,
+    .level4-node,
+    .level5-node,
+    .level6-node,
+    .level7-node,
+    .level8-node,
+    .level9-node,
+    .level10-node {
+        margin-top: 40px;
+        /* More space between Level 3 and Level 2 */
+        padding-left: 10px;
+    }
+    
+    .parent-node {
+        padding-bottom: 1px;
+        /* Space between parent and line */
+    }
+</style>
+
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentParentNode = "new parent";
+        let currentParentId;
+        let currentLevel2Id, currentLevel3Id;
+        let lastClickedNode = null;
+
+        function fetchAndRenderTrees() {
+            fetch('https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel1')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) renderTrees(data.data);
+                })
+                .catch(error => console.error("Error fetching data from API", error));
+        }
+
+        function renderTrees(data) {
+            const treeContainer = document.querySelector('.displaytrees');
+            treeContainer.innerHTML = '';
+
+            data.forEach(item => {
+                const treeHTML = `
+                <div class="tree-node" data-id="${item["1_id"]}">
+                    <a href="#" class="tree-parent" data-name="${item.name}">${item.name}</a>
+                    <div class="level2-container" id="level2-${item["1_id"]}"></div>
+                </div>
+            `;
+                treeContainer.insertAdjacentHTML('beforeend', treeHTML);
+            });
+
+            drawConnections();
+        }
+
+        function fetchLevel2Data(parentId) {
+            fetch('https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel2', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: parentId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) renderLevel2(data.data, parentId);
+                })
+                .catch(error => console.error("Error fetching Level 2 data", error));
+        }
+
+        function renderLevel2(data, parentId) {
+            const selectedTreeContainer = document.getElementById('selectedTree');
+            selectedTreeContainer.innerHTML = `<div class="parent-node">${currentParentNode}</div>`;
+
+            const level2Container = document.getElementById(`level2-${parentId}`);
+            level2Container.innerHTML = '';
+
+            if (Array.isArray(data) && data.length > 0) {
+                const childrenHTML = data.map(item => `
+                <div class="child-node" data-id="${item["2_id"]}">
+                    <a href="#" class="level2-node" data-id="${item["2_id"]}">${item.name}</a>
+                </div>
+            `).join('');
+                selectedTreeContainer.insertAdjacentHTML('beforeend', `<div class="child-nodes-container">${childrenHTML}</div>`);
+            }
+
+            drawConnections();
+        }
+
+        function fetchLevel3Data(level2Id) {
+            fetch('https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel3', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: level2Id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) renderLevel3(data.data, level2Id);
+                })
+                .catch(error => console.error("Error fetching Level 3 data", error));
+        }
+
+
+        function renderLevel3(data, level2Id) {
+            const selectedTreeContainer = document.getElementById('selectedTree');
+            const level3Container = selectedTreeContainer.querySelector('.level3-nodes-container');
+            if (level3Container) {
+                level3Container.remove();
+            }
+
+            if (Array.isArray(data) && data.length > 0) {
+                const level3HTML = data.map(item => `
+            <div class="level3-node" data-id="${item["3_id"]}">
+                <a href="#" class="level3-node" data-id="${item["3_id"]}">${item.name}</a>
+            </div>
+        `).join('');
+                selectedTreeContainer.insertAdjacentHTML('beforeend', `<div class="level3-nodes-container">${level3HTML}</div>`);
+            }
+        }
+
+        function fetchLevel4Data(level3Id) {
+            fetch('https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel4', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: level3Id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) renderLevel4(data.data, level3Id);
+                })
+                .catch(error => console.error("Error fetching Level 4 data", error));
+        }
+
+        function renderLevel4(data, level3Id) {
+            const selectedTreeContainer = document.getElementById('selectedTree');
+            const level4Container = selectedTreeContainer.querySelector('.level4-nodes-container');
+            if (level4Container) {
+                level4Container.remove();
+            }
+
+            if (Array.isArray(data) && data.length > 0) {
+                const level4HTML = data.map(item => `
+            <div class="level4-node" data-id="${item["4_id"]}">
+                <a href="#" class="level4-node" data-id="${item["4_id"]}">${item.name}</a>
+            </div>
+        `).join('');
+                selectedTreeContainer.insertAdjacentHTML('beforeend', `<div class="level4-nodes-container">${level4HTML}</div>`);
+            }
+        }
+
+        function fetchLevel5Data(level4Id) {
+            fetch('https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel5', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: level4Id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) renderLevel5(data.data, level4Id);
+                })
+                .catch(error => console.error("Error fetching Level 5 data", error));
+        }
+
+        function renderLevel5(data, level4Id) {
+            const selectedTreeContainer = document.getElementById('selectedTree');
+            const level5Container = selectedTreeContainer.querySelector('.level5-nodes-container');
+            if (level5Container) {
+                level5Container.remove();
+            }
+
+            if (Array.isArray(data) && data.length > 0) {
+                const level5HTML = data.map(item => `
+            <div class="level5-node" data-id="${item["5_id"]}">
+                <a href="#" class="level5-node"  data-id="${item["5_id"]}">${item.name}</a>
+            </div>
+        `).join('');
+                selectedTreeContainer.insertAdjacentHTML('beforeend', `<div class="level5-nodes-container">${level5HTML}</div>`);
+            }
+        }
+
+        function fetchLevel6Data(level5Id) {
+            fetch('https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel6', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: level5Id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) renderLevel6(data.data, level5Id);
+                })
+                .catch(error => console.error("Error fetching Level 6 data", error));
+        }
+
+        function renderLevel6(data, level5Id) {
+            const selectedTreeContainer = document.getElementById('selectedTree');
+            const level6Container = selectedTreeContainer.querySelector('.level6-nodes-container');
+            if (level6Container) {
+                level6Container.remove();
+            }
+
+            if (Array.isArray(data) && data.length > 0) {
+                const level6HTML = data.map(item => `
+            <div class="level6-node" data-id="${item["6_id"]}">
+                <a href="#" class="level6-node" data-id="${item["6_id"]}">${item.name}</a>
+            </div>
+        `).join('');
+                selectedTreeContainer.insertAdjacentHTML('beforeend', `<div class="level6-nodes-container">${level6HTML}</div>`);
+            }
+        }
+
+        function fetchLevel7Data(level6Id) {
+            fetch('https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel7', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: level6Id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) renderLevel7(data.data, level6Id);
+                })
+                .catch(error => console.error("Error fetching Level 7 data", error));
+        }
+
+        function renderLevel7(data, level6Id) {
+            const selectedTreeContainer = document.getElementById('selectedTree');
+            const level7Container = selectedTreeContainer.querySelector('.level7-nodes-container');
+            if (level7Container) {
+                level7Container.remove();
+            }
+
+            if (Array.isArray(data) && data.length > 0) {
+                const level7HTML = data.map(item => `
+            <div class="level7-node" data-id="${item["7_id"]}">
+                <a href="#" class="level7-node" data-id="${item["7_id"]}">${item.name}</a>
+            </div>
+        `).join('');
+                selectedTreeContainer.insertAdjacentHTML('beforeend', `<div class="level7-nodes-container">${level7HTML}</div>`);
+            }
+        }
+
+        function fetchLevel8Data(level7Id) {
+            fetch('https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel8', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: level7Id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) renderLevel8(data.data, level7Id);
+                })
+                .catch(error => console.error("Error fetching Level 8 data", error));
+        }
+
+        function renderLevel8(data, level7Id) {
+            const selectedTreeContainer = document.getElementById('selectedTree');
+            const level8Container = selectedTreeContainer.querySelector('.level8-nodes-container');
+            if (level8Container) {
+                level8Container.remove();
+            }
+
+            if (Array.isArray(data) && data.length > 0) {
+                const level8HTML = data.map(item => `
+            <div class="level8-node" data-id="${item["8_id"]}">
+                <a href="#" class="level8-node" data-id="${item["8_id"]}">${item.name}</a>
+            </div>
+        `).join('');
+                selectedTreeContainer.insertAdjacentHTML('beforeend', `<div class="level8-nodes-container">${level8HTML}</div>`);
+            }
+        }
+
+        function fetchLevel9Data(level8Id) {
+            fetch('https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel9', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: level8Id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) renderLevel9(data.data, level8Id);
+                })
+                .catch(error => console.error("Error fetching Level 9 data", error));
+        }
+
+        function renderLevel9(data, level8Id) {
+            const selectedTreeContainer = document.getElementById('selectedTree');
+            const level9Container = selectedTreeContainer.querySelector('.level9-nodes-container');
+            if (level9Container) {
+                level9Container.remove();
+            }
+
+            if (Array.isArray(data) && data.length > 0) {
+                const level9HTML = data.map(item => `
+            <div class="level9-node" data-id="${item["9_id"]}">
+                <a href="#" class="level9-node" data-id="${item["9_id"]}">${item.name}</a>
+            </div>
+        `).join('');
+                selectedTreeContainer.insertAdjacentHTML('beforeend', `<div class="level9-nodes-container">${level9HTML}</div>`);
+            }
+        }
+
+        function fetchLevel10Data(level9Id) {
+            fetch('https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel10', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: level9Id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) renderLevel10(data.data, level9Id);
+                })
+                .catch(error => console.error("Error fetching Level 10 data", error));
+        }
+
+        function renderLevel10(data, level9Id) {
+            const selectedTreeContainer = document.getElementById('selectedTree');
+            const level10Container = selectedTreeContainer.querySelector('.level10-nodes-container');
+            if (level10Container) {
+                level10Container.remove();
+            }
+
+            if (Array.isArray(data) && data.length > 0) {
+                const level10HTML = data.map(item => `
+            <div class="level10-node" data-id="${item["10_id"]}">
+                <a href="#" class="level10-node" data-id="${item["10_id"]}">${item.name}</a>
+            </div>
+        `).join('');
+                selectedTreeContainer.insertAdjacentHTML('beforeend', `<div class="level10-nodes-container">${level10HTML}</div>`);
+            }
+        }
+
+
+        function drawConnections() {
+            const selectedTreeContainer = document.getElementById('selectedTree');
+            const parentNode = selectedTreeContainer.querySelector('.parent-node');
+            const childNodes = selectedTreeContainer.querySelectorAll('.child-node');
+
+            document.querySelectorAll('.connection-line').forEach(line => line.remove());
+
+            if (childNodes.length) {
+                const parentRect = parentNode.getBoundingClientRect();
+                const parentCenterX = parentRect.left + parentRect.width / 2;
+                const parentBottomY = parentRect.bottom;
+
+                childNodes.forEach(child => {
+                    const childRect = child.getBoundingClientRect();
+                    const childCenterX = childRect.left + childRect.width / 2;
+                    const childTopY = childRect.top;
+
+                    const verticalLine = document.createElement('div');
+                    verticalLine.classList.add('connection-line', 'vertical-line');
+                    verticalLine.style.left = `${childCenterX}px`;
+                    verticalLine.style.top = `${parentBottomY}px`;
+                    verticalLine.style.height = `${Math.abs(childTopY - parentBottomY)}px`;
+
+                    const horizontalLine = document.createElement('div');
+                    horizontalLine.classList.add('connection-line', 'horizontal-line');
+                    horizontalLine.style.left = `${parentCenterX}px`;
+                    horizontalLine.style.top = `${parentBottomY}px`;
+                    horizontalLine.style.width = `${Math.abs(childCenterX - parentCenterX)}px`;
+
+                    document.body.append(verticalLine, horizontalLine);
+                });
+            }
+        }
+
+        function hideSubsequentLevels(fromLevel) {
+            for (let i = fromLevel; i <= 10; i++) {
+                const levelContainer = document.querySelector(`.level${i}-nodes-container`);
+                if (levelContainer) {
+                    levelContainer.style.display = 'none'; // Hide the container
+                }
+            }
+        }
+
+
+        document.addEventListener('click', function(e) {
+            const target = e.target;
+
+            // Check if the clicked element matches any node from the tree
+            if (
+                target.matches(
+                    '.tree-parent, .level2-node, .level3-node, .level4-node, .level5-node, ' +
+                    '.level6-node, .level7-node, .level8-node, .level9-node, .level10-node'
+                )
+            ) {
+                e.preventDefault(); // Prevent default anchor behavior
+
+                // Get the closest .tree-node (parent wrapper) and extract its ID
+                const closestTreeNode = target.closest('.tree-node');
+                const nodeId = target.dataset.id || (closestTreeNode ? closestTreeNode.dataset.id : 'N/A');
+                const nodeClass = target.className;
+                const nodeName = target.dataset.name || target.textContent.trim();
+
+                // Log the information to the console
+                console.log(`Node ID: ${nodeId}, Class: ${nodeClass}, Name: ${nodeName}`);
+
+                // Store the clicked node name in the input field
+                document.getElementById('parentNodeInput').value = nodeName;
+
+                lastClickedNode = {
+                    nodeId: nodeId,
+                    nodeClass: nodeClass,
+                    nodeName: nodeName
+                };
+
+                console.log("Last clicked node:", lastClickedNode);
+
+                // Determine the clicked level and hide subsequent levels
+                let clickedLevel = parseInt(nodeClass.match(/\d+/)); // Extract level number from class
+                if (!isNaN(clickedLevel)) {
+                    hideSubsequentLevels(clickedLevel + 1); // Hide all subsequent levels
+                }
+
+                // Handle click actions based on the node type
+                if (target.classList.contains('tree-parent')) {
+                    currentParentNode = nodeName;
+                    currentParentId = nodeId;
+                    fetchLevel2Data(currentParentId);
+                } else if (target.classList.contains('level2-node')) {
+                    currentLevel2Id = nodeId;
+                    fetchLevel3Data(currentLevel2Id);
+                } else if (target.classList.contains('level3-node')) {
+                    currentLevel3Id = nodeId;
+                    fetchLevel4Data(currentLevel3Id);
+                } else if (target.classList.contains('level4-node')) {
+                    currentLevel4Id = nodeId;
+                    fetchLevel5Data(currentLevel4Id);
+                } else if (target.classList.contains('level5-node')) {
+                    currentLevel5Id = nodeId;
+                    fetchLevel6Data(currentLevel5Id);
+                } else if (target.classList.contains('level6-node')) {
+                    currentLevel6Id = nodeId;
+                    fetchLevel7Data(currentLevel6Id);
+                } else if (target.classList.contains('level7-node')) {
+                    currentLevel7Id = nodeId;
+                    fetchLevel8Data(currentLevel7Id);
+                } else if (target.classList.contains('level8-node')) {
+                    currentLevel8Id = nodeId;
+                    fetchLevel9Data(currentLevel8Id);
+                } else if (target.classList.contains('level9-node')) {
+                    currentLevel9Id = nodeId;
+                    fetchLevel10Data(currentLevel9Id);
+                }
+
+                // Hide the dropdown input if it's visible
+                document.getElementById('dropdownInput').style.display = 'none';
+            }
+        });
+
+        document.getElementById('addRouteNode').addEventListener('click', function() {
+            const dropdownInput = document.getElementById('dropdownInput');
+            dropdownInput.style.display = dropdownInput.style.display === 'none' ? 'block' : 'none';
+            document.getElementById('routeNodeInput').value = '';
+        });
+
+        document.getElementById('routeNodeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newNode = document.getElementById('routeNodeInput').value.trim();
+
+            if (!newNode) {
+                alert("Node name cannot be empty.");
+                return;
+            }
+
+            if (!lastClickedNode) {
+                alert("Please select a parent node first.");
+                return;
+            }
+
+            // Log the last clicked node info on submission
+            console.log(`Submitting new node`);
+            console.log(`Parent ID: ${lastClickedNode.nodeId}`);
+            console.log(`Parent Class: ${lastClickedNode.nodeClass}`);
+            console.log(`New Node Name: ${newNode}`);
+
+            let apiUrl, dataToSend;
+
+            // Determine the API and data based on the node class
+            switch (lastClickedNode.nodeClass) {
+                case 'tree-parent':
+                    apiUrl = 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level2';
+                    break;
+                case 'level2-node':
+                    apiUrl = 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level3';
+                    break;
+                case 'level3-node':
+                    apiUrl = 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level4';
+                    break;
+                case 'level4-node':
+                    apiUrl = 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level5';
+                    break;
+                case 'level5-node':
+                    apiUrl = 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level6';
+                    break;
+                case 'level6-node':
+                    apiUrl = 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level7';
+                    break;
+                case 'level7-node':
+                    apiUrl = 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level8';
+                    break;
+                case 'level8-node':
+                    apiUrl = 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level9';
+                    break;
+                case 'level9-node':
+                    apiUrl = 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level10';
+                    break;
+                case 'level10-node':
+                    alert("You cannot add a node beyond level 10.");
+                    return; // Stop further execution
+                default:
+                    console.error("Invalid node class.");
+                    return;
+            }
+
+            dataToSend = {
+                p_id: lastClickedNode.nodeId,
+                name: newNode
+            };
+
+            // Perform the API call to add the new node
+            fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dataToSend)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Node added successfully!");
+                        document.getElementById('dropdownInput').style.display = 'none';
+                        fetchAndRenderTrees();
+                    } else {
+                        alert("Error adding node: " + data.message);
+                    }
+                })
+                .catch(error => console.error("Error adding node", error));
+        });
+
+        fetchAndRenderTrees();
+    });
+</script>

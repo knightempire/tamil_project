@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tamil Project - Mind Map</title>
+    <link href='https://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .tree-container {
+            position: relative;
+            margin: 20px;
+            text-align: center;
+        }
+        
+        .tree-node {
+            position: relative;
+            display: inline-block;
+            margin: 20px;
+            text-align: center;
+        }
+        
+        .tree-node a {
+            padding: 10px 15px;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            color: #007bff;
+            text-decoration: none;
+        }
+        
+        .tree-node a:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .connection-line {
+            position: absolute;
+            background: #007bff;
+            z-index: -1;
+        }
+        
+        .vertical-line {
+            width: 2px;
+        }
+        
+        .horizontal-line {
+            height: 2px;
+        }
+        
+        .top-right-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .distree {
+            margin-top: 50px;
+            text-align: center;
+            /* Center the content */
+        }
+        
+        #selectedTree {
+            display: inline-block;
+            /* Align content */
+            position: relative;
+            /* Allow positioning for lines */
+            margin-top: 20px;
+        }
+        
+        .parent-node {
+            font-weight: bold;
+            /* Make parent node stand out */
+            margin-bottom: 10px;
+        }
+        
+        .child-node {
+            display: inline-block;
+            /* Align child nodes in a row */
+            margin: 10px 20px;
+            /* Space between child nodes */
+            position: relative;
+            /* Required for connection lines */
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="text-center">Mind Map of Nodes</h1>
+
+    <div class="main">
+        <div class="displaytrees tree-container"></div>
+    </div>
+
+    <button id="addRouteNode" class="top-right-button btn btn-primary">Add Route Node</button>
+
+    <div id="dropdownInput" class="dropdown-input form-container" style="display: none;">
+        <form id="routeNodeForm" class="bg-light p-3 border rounded">
+            <h5 class="mb-3">Add Route Node</h5>
+            <div class="form-group">
+                <label for="parentNodeInput">Parent Node:</label>
+                <input type="text" class="form-control" id="parentNodeInput" name="parentNodeInput" value="new parent" readonly>
+            </div>
+            <div class="form-group">
+                <label for="routeNodeInput">Enter Route Node:</label>
+                <input type="text" class="form-control" id="routeNodeInput" name="routeNodeInput" placeholder="Route Node" required>
+            </div>
+            <button type="submit" class="btn btn-success btn-block">Submit</button>
+        </form>
+    </div>
+
+    <div class="distree">
+        <h1>trees</h1>
+        <div id="selectedTree"></div>
+        <!-- Div to display selected tree nodes -->
+    </div>
+
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+
+    <script>
+        $(document).ready(function() {
+            let currentParentNode = "new parent";
+            let currentParentId;
+
+            function fetchAndRenderTrees() {
+                $.ajax({
+                    url: 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel1',
+                    type: 'GET',
+                    contentType: 'application/json',
+                    success: function(response) {
+                        if (response.success) {
+                            renderTrees(response.data);
+                        }
+                    },
+                    error: function(error) {
+                        console.error("Error fetching data from API", error);
+                    }
+                });
+            }
+
+            function renderTrees(data) {
+                const treeContainer = $('.displaytrees');
+                treeContainer.empty();
+
+                data.forEach(item => {
+                    const treeHTML = `
+                        <div class="tree-node" data-id="${item["1_id"]}">
+                            <a href="#" class="tree-parent" data-name="${item.name}">${item.name}</a>
+                            <div class="level2-container" id="level2-${item["1_id"]}"></div>
+                        </div>
+                    `;
+                    treeContainer.append(treeHTML);
+                });
+
+                drawConnections();
+            }
+
+            function fetchLevel2Data(parentId) {
+                $.ajax({
+                    url: 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel2',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: parentId
+                    }),
+                    success: function(response) {
+                        if (response.success) {
+                            renderLevel2(response.data, parentId);
+                        }
+                    },
+                    error: function(error) {
+                        console.error("Error fetching Level 2 data", error);
+                    }
+                });
+            }
+
+            function renderLevel2(data, parentId) {
+                const selectedTreeContainer = $('#selectedTree');
+                selectedTreeContainer.empty(); // Clear previous content
+
+                // Display the parent node
+                const parentNodeHTML = `
+                    <div class="parent-node">${currentParentNode}</div>
+                `;
+                selectedTreeContainer.append(parentNodeHTML);
+
+                if (Array.isArray(data) && data.length > 0) {
+                    const childrenHTML = data.map(item => `
+                        <div class="child-node" data-id="${item["2_id"]}">
+                            <a href="#" class="level2-node" data-pid="${item.p_id}">${item.name}</a>
+                        </div>
+                    `).join('');
+
+                    selectedTreeContainer.append(childrenHTML);
+                }
+
+                // Draw connections
+                drawTreeConnections();
+            }
+
+            function drawTreeConnections() {
+                const selectedTreeContainer = $('#selectedTree');
+                const parentNode = selectedTreeContainer.find('.parent-node');
+                const childNodes = selectedTreeContainer.find('.child-node');
+
+                // Clear previous lines
+                $('.connection-line').remove();
+
+                if (childNodes.length) {
+                    const parentOffset = parentNode.offset();
+                    const parentCenterX = parentOffset.left + parentNode.outerWidth() / 2;
+                    const parentBottomY = parentOffset.top + parentNode.outerHeight();
+
+                    childNodes.each(function() {
+                        const $child = $(this);
+                        const childOffset = $child.offset();
+                        const childCenterX = childOffset.left + $child.outerWidth() / 2;
+                        const childTopY = childOffset.top;
+
+                        // Draw vertical line from parent to child
+                        const verticalLine = $('<div class="connection-line vertical-line"></div>');
+                        const lineHeight = childTopY - parentBottomY;
+
+                        verticalLine.css({
+                            left: parentCenterX,
+                            top: parentBottomY,
+                            height: Math.abs(lineHeight)
+                        });
+
+                        $('body').append(verticalLine);
+
+                        // Draw horizontal line from parent to child
+                        const horizontalLine = $('<div class="connection-line horizontal-line"></div>');
+                        const horizontalLineLength = childCenterX - parentCenterX;
+
+                        horizontalLine.css({
+                            left: parentCenterX,
+                            top: parentBottomY,
+                            width: Math.abs(horizontalLineLength)
+                        });
+
+                        $('body').append(horizontalLine);
+                    });
+                }
+            }
+
+            $(document).on('click', '.tree-parent', function(e) {
+                e.preventDefault();
+                currentParentNode = $(this).data('name');
+                currentParentId = $(this).parent().data('id');
+                $('#parentNodeInput').val(currentParentNode);
+                fetchLevel2Data(currentParentId);
+            });
+
+            $('#addRouteNode').on('click', function() {
+                $('#dropdownInput').toggle();
+            });
+
+            $('#routeNodeForm').on('submit', function(e) {
+                e.preventDefault();
+                const inputValue = $('#routeNodeInput').val();
+
+                if (!inputValue.trim()) return;
+
+                const endpoint = !treeNodeSelected ? 'level1' : 'level2';
+                const data = treeNodeSelected ? {
+                    p_id: currentParentId,
+                    name: inputValue
+                } : {
+                    name: inputValue
+                };
+
+                $.ajax({
+                    url: `https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/${endpoint}`,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        if (response.success) {
+                            $('#routeNodeInput').val('');
+                            $('#dropdownInput').hide();
+
+                            if (!treeNodeSelected) {
+                                fetchAndRenderTrees();
+                            } else {
+                                fetchLevel2Data(currentParentId);
+                            }
+                        }
+                    },
+                    error: function(error) {
+                        console.error(`Error sending data to api/${endpoint}`, error);
+                    }
+                });
+            });
+
+            // Initial load
+            fetchAndRenderTrees();
+        });
+    </script>
+</body>
+
+</html>
