@@ -17,7 +17,7 @@ const stream = require("stream");
 const app = express();
 const upload = multer();
 
-const port = 3000 || null;
+const port = 3002 || null;
 
 
 app.use(cors());
@@ -514,6 +514,23 @@ app.post('/api/level10', async(req, res) => {
     }
 });
 
+
+
+// Route for retrieving all Level 1 entries
+app.get('/api/dislevel1', async(req, res) => {
+    try {
+        console.log('API Level 1 retrieval requested');
+
+        // Query to get all Level 1 entries
+        const [rows] = await pool.execute('SELECT * FROM level1');
+
+        // Send response with Level 1 entries
+        res.json({ success: true, data: rows });
+    } catch (error) {
+        console.error('Error during Level 1 retrieval:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 
 
