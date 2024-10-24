@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tamil project</title>
+    <link href='https://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/dash.css">
+    <style>
+        /* Centering and layout adjustments */
+        .main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .tree-options {
+            text-decoration: underline;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        /* Initially hide both trees */
+        .tree {
+            display: none;
+            margin: 20px auto;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 10px;
+            margin-left: 0;
+        }
+
+        .nav ul ul {
+            display: none;
+        }
+
+        .nav a {
+            text-decoration: none;
+            display: block;
+            padding: 5px;
+        }
+
+        .nav a:hover {
+            background-color: #ddd;
+        }
+
+        .expanded > ul {
+            display: block;
+        }
+
+        /* Ensure tree container is centered */
+        nav {
+            text-align: left;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Root Node</h1>
+
+
+    <div class="main">  
+    <!-- Options to switch between trees -->
+    <div>
+        <span id="tree1Option" class="tree-options">Tree 1</span> |
+        <span id="tree2Option" class="tree-options">Tree 2 (Example)</span>
+    </div>
+
+    <!-- Tree 1 -->
+    <div id="tree1" class="tree">
+        <nav class="nav">
+            <ul>
+                <li>
+                    <a href="#">Home</a>
+                    <ul>
+                        <li>
+                            <a href="#">Lab</a>
+                            <ul>
+                                <li>
+                                    <a href="#">Code</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#">Html</a>
+                                            <ul>
+                                                <li>
+                                                    <a href="#">Css</a>
+                                                    <ul>
+                                                        <li>
+                                                            <a href="#">Jquery</a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="#">Graph</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#">Image</a>
+                                            <ul>
+                                                <li>
+                                                    <a href="#">Design</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#">Blog</a>
+                            <ul>
+                                <li>
+                                    <a href="#">Category</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#">Code</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Graph</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#">About</a>
+                            <ul>
+                                <li>
+                                    <a href="#">Vcard</a>
+                                </li>
+                                <li>
+                                    <a href="#">Map</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Tree 2 (Example, smaller) -->
+    <div id="tree2" class="tree">
+        <nav class="nav">
+            <ul>
+                <li>
+                    <a href="#">Example Root</a>
+                    <ul>
+                        <li>
+                            <a href="#">Branch 1</a>
+                            <ul>
+                                <li>
+                                    <a href="#">Leaf 1</a>
+                                </li>
+                                <li>
+                                    <a href="#">Leaf 2</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#">Branch 2</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+</div>
+
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+    <script>
+        $(document).ready(function () {
+            // Initially expand only the Home node for Tree 1
+            $('#tree1 nav > ul > li').addClass('expanded');
+
+            // Tree expansion/collapse logic for both trees
+            $('nav a').on('click', function (e) {
+                e.preventDefault();
+                var $nextUl = $(this).next('ul');
+                if ($nextUl.length) {
+                    $(this).parent().toggleClass('expanded');
+                    $nextUl.slideToggle();
+                }
+            });
+
+            // Toggle tree visibility based on selected option
+            $('#tree1Option').on('click', function () {
+                $('#tree1').show();
+                $('#tree2').hide();
+            });
+
+            $('#tree2Option').on('click', function () {
+                $('#tree2').show();
+                $('#tree1').hide();
+            });
+
+            // Show Tree 1 by default on load
+            $('#tree1').show();
+        });
+    </script>
+</body>
+
+</html>

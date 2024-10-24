@@ -16,7 +16,7 @@ html,
 body {
     width: 100%;
     height: 100%;
-    background: black;
+    background: rgb(26, 61, 61);
     font-family: 'Fjalla One', sans-serif;
     font-size: 18px;
 }
