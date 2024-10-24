@@ -146,64 +146,100 @@
     </div>
 
     <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-    <script>
-        $(document).ready(function() {
-            let currentParentNode = "new parent"; // Default parent node name
+<script>
+    $(document).ready(function() {
+    let currentParentNode = "new parent"; // Default parent node name
 
-            // Tree expansion/collapse logic for both trees
-            $('nav a').on('click', function(e) {
-                e.preventDefault();
-                var nodeText = $(this).text(); // Get the text of the clicked node
-                console.log(nodeText); // Print the text to the console
+    // Variable to track whether a tree node is selected
+    let treeNodeSelected = false;
 
-                // Update parent node input
-                currentParentNode = nodeText;
-                $('#parentNodeInput').val(currentParentNode);
+    // Tree expansion/collapse logic for both trees
+    $('nav a').on('click', function(e) {
+        e.preventDefault();
+        var nodeText = $(this).text(); // Get the text of the clicked node
+        console.log(nodeText); // Print the text to the console
 
-                var $nextUl = $(this).next('ul');
-                if ($nextUl.length) {
-                    $(this).parent().toggleClass('expanded');
-                    $nextUl.slideToggle();
+        // Mark that a tree node has been selected
+        treeNodeSelected = true;
+
+        // Update parent node input
+        currentParentNode = nodeText;
+        $('#parentNodeInput').val(currentParentNode);
+
+        var $nextUl = $(this).next('ul');
+        if ($nextUl.length) {
+            $(this).parent().toggleClass('expanded');
+            $nextUl.slideToggle();
+        }
+    });
+
+    // Toggle tree visibility based on selected option and reset expanded state
+    $('#tree1Option').on('click', function() {
+        $('#tree1').show();
+        $('#tree2').hide();
+
+        // Reset tree 2's expanded state
+        $('#tree2 nav ul ul').slideUp();
+        $('#tree2 nav ul li').removeClass('expanded');
+    });
+
+    $('#tree2Option').on('click', function() {
+        $('#tree2').show();
+        $('#tree1').hide();
+
+        // Reset tree 1's expanded state
+        $('#tree1 nav ul ul').slideUp();
+        $('#tree1 nav ul li').removeClass('expanded');
+    });
+
+    // Hide the tree by default on load
+    $('.tree').hide();
+
+    // Toggle dropdown input visibility when the button is clicked
+    $('#addRouteNode').on('click', function() {
+        $('#dropdownInput').toggle();
+    });
+
+    // Handle form submission
+    $('#routeNodeForm').on('submit', function(e) {
+        e.preventDefault(); // Prevent the form from submitting normally
+        var inputValue = $('#routeNodeInput').val(); // Get the input value
+
+        // Check if no tree node is selected
+        if (!treeNodeSelected) {
+            console.log("No tree node selected, submitting data to API");
+
+            // Prepare the data to send
+            var data = {
+                name: inputValue
+            };
+
+            // Send the data to the API
+            $.ajax({
+                url: 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level1',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    console.log("Data successfully sent to API");
+                    console.log(response);
+                },
+                error: function(error) {
+                    console.error("Error sending data to API");
+                    console.error(error);
                 }
             });
+        } else {
+            console.log("Tree node selected, no API call made");
+        }
 
-            // Toggle tree visibility based on selected option and reset expanded state
-            $('#tree1Option').on('click', function() {
-                $('#tree1').show();
-                $('#tree2').hide();
+        console.log(inputValue); // Print to the console
+        console.log("Parent Node: " + currentParentNode); // Print current parent node
+        $('#routeNodeInput').val(''); // Clear the input
+    });
+});
 
-                // Reset tree 2's expanded state
-                $('#tree2 nav ul ul').slideUp();
-                $('#tree2 nav ul li').removeClass('expanded');
-            });
-
-            $('#tree2Option').on('click', function() {
-                $('#tree2').show();
-                $('#tree1').hide();
-
-                // Reset tree 1's expanded state
-                $('#tree1 nav ul ul').slideUp();
-                $('#tree1 nav ul li').removeClass('expanded');
-            });
-
-            // Hide the tree by default on load
-            $('.tree').hide();
-
-            // Toggle dropdown input visibility when the button is clicked
-            $('#addRouteNode').on('click', function() {
-                $('#dropdownInput').toggle();
-            });
-
-            // Handle form submission
-            $('#routeNodeForm').on('submit', function(e) {
-                e.preventDefault(); // Prevent the form from submitting normally
-                var inputValue = $('#routeNodeInput').val(); // Get the input value
-                console.log(inputValue); // Print to the console
-                console.log("Parent Node: " + currentParentNode); // Print current parent node
-                $('#routeNodeInput').val(''); // Clear the input
-            });
-        });
-    </script>
+</script>
 </body>
 
 </html>
