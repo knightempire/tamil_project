@@ -3,12 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Tamil project</title>
+    <title>Tamil Project</title>
     <link href='https://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/dash.css">
-
 </head>
 
 <body>
@@ -16,113 +15,9 @@
 
     <div class="main">
         <!-- Options to switch between trees -->
-        <div>
-            <span id="tree1Option" class="tree-options">Tree 1</span> |
-            <span id="tree2Option" class="tree-options">Tree 2 (Example)</span>
-        </div>
-
-        <!-- Tree 1 -->
-        <div id="tree1" class="tree">
-            <nav class="nav">
-                <ul>
-                    <li>
-                        <a href="#">Home</a>
-                        <ul>
-                            <li>
-                                <a href="#">Lab</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">Code</a>
-                                        <ul>
-                                            <li>
-                                                <a href="#">Html</a>
-                                                <ul>
-                                                    <li>
-                                                        <a href="#">Css</a>
-                                                        <ul>
-                                                            <li>
-                                                                <a href="#">Jquery</a>
-                                                            </li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a href="#">Graph</a>
-                                        <ul>
-                                            <li>
-                                                <a href="#">Image</a>
-                                                <ul>
-                                                    <li>
-                                                        <a href="#">Design</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="#">Blog</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">Category</a>
-                                        <ul>
-                                            <li>
-                                                <a href="#">Code</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Graph</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="#">About</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">Vcard</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Map</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-
-        <!-- Tree 2 (Example, smaller) -->
-        <div id="tree2" class="tree">
-            <nav class="nav">
-                <ul>
-                    <li>
-                        <a href="#">Example Root</a>
-                        <ul>
-                            <li>
-                                <a href="#">Branch 1</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">Leaf 1</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Leaf 2</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="#">Branch 2</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+        <div id="treeOptions" class="text-center mb-3"></div>
+        <div class="displaytree"></div>
+        <!-- Container for trees -->
     </div>
 
     <!-- Button in the top-right corner -->
@@ -140,54 +35,148 @@
                 <label for="routeNodeInput">Enter Route Node:</label>
                 <input type="text" class="form-control" id="routeNodeInput" name="routeNodeInput" placeholder="Route Node" required>
             </div>
-
             <button type="submit" class="btn btn-success btn-block">Submit</button>
         </form>
     </div>
 
     <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+
     <script>
         $(document).ready(function() {
-            let currentParentNode = "new parent"; // Default parent node name
+                    let currentParentNode = "new parent"; // Default parent node name
+                    let treeNodeSelected = false;
+                    let currentParentId; // To store the selected parent node ID
 
-            // Tree expansion/collapse logic for both trees
-            $('nav a').on('click', function(e) {
-                e.preventDefault();
-                var nodeText = $(this).text(); // Get the text of the clicked node
-                console.log(nodeText); // Print the text to the console
+                    // Fetch the tree data from the API
+                    $.ajax({
+                        url: 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel1',
+                        type: 'GET',
+                        contentType: 'application/json',
+                        success: function(response) {
+                            console.log("API Response:", response); // Log the API response
 
-                // Update parent node input
-                currentParentNode = nodeText;
-                $('#parentNodeInput').val(currentParentNode);
+                            if (response.success) {
+                                renderTrees(response.data);
+                            } else {
+                                console.error("Failed to fetch tree data.");
+                            }
+                        },
+                        error: function(error) {
+                            console.error("Error fetching data from API");
+                            console.error(error);
+                        }
+                    });
 
-                var $nextUl = $(this).next('ul');
-                if ($nextUl.length) {
-                    $(this).parent().toggleClass('expanded');
-                    $nextUl.slideToggle();
-                }
-            });
+                    function renderTrees(data) {
+                        const treeOptions = $('#treeOptions');
+                        const treeContainer = $('.displaytree');
 
-            // Toggle tree visibility based on selected option and reset expanded state
-            $('#tree1Option').on('click', function() {
-                $('#tree1').show();
-                $('#tree2').hide();
+                        // Clear existing trees
+                        treeContainer.empty();
 
-                // Reset tree 2's expanded state
-                $('#tree2 nav ul ul').slideUp();
-                $('#tree2 nav ul li').removeClass('expanded');
-            });
+                        data.forEach(item => {
+                            // Create a new tree structure
+                            const treeId = `tree${item["1_id"]}`;
+                            const treeHTML = `
+                        <div id="${treeId}" class="tree" style="display: none;">
+                            <nav class="nav">
+                                <ul>
+                                    <li>
+                                        <a href="#" class="tree-parent" data-id="${item["1_id"]}" data-name="${item.name}">${item.name}</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    `;
 
-            $('#tree2Option').on('click', function() {
-                $('#tree2').show();
-                $('#tree1').hide();
+                            // Append the new tree to the container
+                            treeContainer.append(treeHTML);
 
-                // Reset tree 1's expanded state
-                $('#tree1 nav ul ul').slideUp();
-                $('#tree1 nav ul li').removeClass('expanded');
-            });
+                            // Add tree option
+                            treeOptions.append(`<span id="${treeId}Option" class="tree-options" style="cursor: pointer;">${item.name}</span> | `);
+                        });
 
-            // Hide the tree by default on load
-            $('.tree').hide();
+                        // Set up click events for the dynamically created tree options
+                        $('.tree-options').on('click', function() {
+                            const selectedTreeId = $(this).attr('id').replace('Option', '');
+                            $('.tree').hide(); // Hide all trees
+                            $(`#${selectedTreeId}`).show(); // Show the selected tree
+                        });
+
+                        // Show the first tree by default if there are any trees
+                        if (data.length > 0) {
+                            $(`#tree${data[0]["1_id"]}`).show();
+                        }
+                    }
+
+                    // Tree click logic for the newly created trees
+                    $(document).on('click', 'nav .tree-parent', function(e) {
+                        e.preventDefault();
+                        const nodeId = $(this).data('id');
+                        const nodeName = $(this).data('name');
+                        console.log(`Clicked Parent Node ID: ${nodeId}, Name: ${nodeName}`);
+
+                        treeNodeSelected = true;
+                        currentParentNode = nodeName;
+                        currentParentId = nodeId; // Store the current parent ID
+                        $('#parentNodeInput').val(currentParentNode);
+
+                        // Fetch Level 2 data based on the clicked Level 1 node
+                        fetchLevel2Data(currentParentId);
+                    });
+
+                    // Function to fetch Level 2 data
+                    function fetchLevel2Data(parentId) {
+                        $.ajax({
+                            url: 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/dislevel2',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                id: parentId
+                            }),
+                            success: function(response) {
+                                console.log("Level 2 Data:", response);
+                                if (response.success) {
+                                    renderLevel2(response.data);
+                                } else {
+                                    console.error("Failed to fetch Level 2 data.");
+                                }
+                            },
+                            error: function(error) {
+                                console.error("Error fetching Level 2 data");
+                                console.error(error);
+                            }
+                        });
+                    }
+
+                    // Function to render Level 2 data
+                    function renderLevel2(data) {
+                        const treeContainer = $('.displaytree');
+
+                        // Clear existing Level 2 trees
+                        treeContainer.find('.level2-tree').remove();
+
+                        // Create a new Level 2 tree structure
+                        const level2TreeHTML = `
+                    <div class="level2-tree">
+                        <nav class="nav">
+                            <ul>
+                                ${data.map(item => `
+                                    <li>
+                                        <a href="#">${item.name}</a>
+                                        <ul>
+                                            <!-- Future Level 3 entries can be nested here -->
+                                        </ul>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </nav>
+                    </div>
+                `;
+
+                // Append the Level 2 tree to the container
+                treeContainer.append(level2TreeHTML);
+            }
 
             // Toggle dropdown input visibility when the button is clicked
             $('#addRouteNode').on('click', function() {
@@ -196,11 +185,53 @@
 
             // Handle form submission
             $('#routeNodeForm').on('submit', function(e) {
-                e.preventDefault(); // Prevent the form from submitting normally
-                var inputValue = $('#routeNodeInput').val(); // Get the input value
-                console.log(inputValue); // Print to the console
-                console.log("Parent Node: " + currentParentNode); // Print current parent node
-                $('#routeNodeInput').val(''); // Clear the input
+                e.preventDefault();
+                var inputValue = $('#routeNodeInput').val();
+
+                if (!treeNodeSelected) {
+                    console.log("No tree node selected, submitting data to api/level1");
+                    var data = {
+                        name: inputValue
+                    };
+                    $.ajax({
+                        url: 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level1',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+                        success: function(response) {
+                            console.log("Data successfully sent to api/level1");
+                            console.log(response);
+                        },
+                        error: function(error) {
+                            console.error("Error sending data to api/level1");
+                            console.error(error);
+                        }
+                    });
+                } else {
+                    // If a tree node is selected, send data to api/level2
+                    console.log("Tree node selected, submitting data to api/level2");
+                    var data = {
+                        p_id: currentParentId,
+                        name: inputValue
+                    };
+                    $.ajax({
+                        url: 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level2',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+                        success: function(response) {
+                            console.log("Data successfully sent to api/level2");
+                            console.log(response);
+                        },
+                        error: function(error) {
+                            console.error("Error sending data to api/level2");
+                            console.error(error);
+                        }
+                    });
+                }
+
+                console.log("Parent Node: " + currentParentNode);
+                $('#routeNodeInput').val('');
             });
         });
     </script>

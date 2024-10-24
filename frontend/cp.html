@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tamil project</title>
+    <link href='https://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/dash.css">
+
+</head>
+
+<body>
+    <h1 class="text-center">Root Node</h1>
+
+    <div class="main">
+        <!-- Options to switch between trees -->
+        <div>
+            <span id="tree1Option" class="tree-options">Tree 1</span> |
+            <span id="tree2Option" class="tree-options">Tree 2 (Example)</span>
+        </div>
+
+        <!-- Tree 1 -->
+        <div id="tree1" class="tree">
+            <nav class="nav">
+                <ul>
+                    <li>
+                        <a href="#">Home</a>
+                        <ul>
+                            <li>
+                                <a href="#">Lab</a>
+                                <ul>
+                                    <li>
+                                        <a href="#">Code</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">Html</a>
+                                                <ul>
+                                                    <li>
+                                                        <a href="#">Css</a>
+                                                        <ul>
+                                                            <li>
+                                                                <a href="#">Jquery</a>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#">Graph</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">Image</a>
+                                                <ul>
+                                                    <li>
+                                                        <a href="#">Design</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">Blog</a>
+                                <ul>
+                                    <li>
+                                        <a href="#">Category</a>
+                                        <ul>
+                                            <li>
+                                                <a href="#">Code</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">Graph</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">About</a>
+                                <ul>
+                                    <li>
+                                        <a href="#">Vcard</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Map</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Tree 2 (Example, smaller) -->
+        <div id="tree2" class="tree">
+            <nav class="nav">
+                <ul>
+                    <li>
+                        <a href="#">Example Root</a>
+                        <ul>
+                            <li>
+                                <a href="#">Branch 1</a>
+                                <ul>
+                                    <li>
+                                        <a href="#">Leaf 1</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Leaf 2</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">Branch 2</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Button in the top-right corner -->
+    <button id="addRouteNode" class="top-right-button btn btn-primary">Add Route Node</button>
+
+    <!-- Dropdown area for input (initially hidden) -->
+    <div id="dropdownInput" class="dropdown-input form-container" style="display: none;">
+        <form id="routeNodeForm" class="bg-light p-3 border rounded">
+            <h5 class="mb-3">Add Route Node</h5>
+            <div class="form-group">
+                <label for="parentNodeInput">Parent Node:</label>
+                <input type="text" class="form-control" id="parentNodeInput" name="parentNodeInput" value="new parent" readonly>
+            </div>
+            <div class="form-group">
+                <label for="routeNodeInput">Enter Route Node:</label>
+                <input type="text" class="form-control" id="routeNodeInput" name="routeNodeInput" placeholder="Route Node" required>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-block">Submit</button>
+        </form>
+    </div>
+
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+    <script>
+        $(document).ready(function() {
+            let currentParentNode = "new parent"; // Default parent node name
+
+            // Variable to track whether a tree node is selected
+            let treeNodeSelected = false;
+
+            // Tree expansion/collapse logic for both trees
+            $('nav a').on('click', function(e) {
+                e.preventDefault();
+                var nodeText = $(this).text(); // Get the text of the clicked node
+                console.log(nodeText); // Print the text to the console
+
+                // Mark that a tree node has been selected
+                treeNodeSelected = true;
+
+                // Update parent node input
+                currentParentNode = nodeText;
+                $('#parentNodeInput').val(currentParentNode);
+
+                var $nextUl = $(this).next('ul');
+                if ($nextUl.length) {
+                    $(this).parent().toggleClass('expanded');
+                    $nextUl.slideToggle();
+                }
+            });
+
+            // Toggle tree visibility based on selected option and reset expanded state
+            $('#tree1Option').on('click', function() {
+                $('#tree1').show();
+                $('#tree2').hide();
+
+                // Reset tree 2's expanded state
+                $('#tree2 nav ul ul').slideUp();
+                $('#tree2 nav ul li').removeClass('expanded');
+            });
+
+            $('#tree2Option').on('click', function() {
+                $('#tree2').show();
+                $('#tree1').hide();
+
+                // Reset tree 1's expanded state
+                $('#tree1 nav ul ul').slideUp();
+                $('#tree1 nav ul li').removeClass('expanded');
+            });
+
+            // Hide the tree by default on load
+            $('.tree').hide();
+
+            // Toggle dropdown input visibility when the button is clicked
+            $('#addRouteNode').on('click', function() {
+                $('#dropdownInput').toggle();
+            });
+
+            // Handle form submission
+            $('#routeNodeForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent the form from submitting normally
+                var inputValue = $('#routeNodeInput').val(); // Get the input value
+
+                // Check if no tree node is selected
+                if (!treeNodeSelected) {
+                    console.log("No tree node selected, submitting data to API");
+
+                    // Prepare the data to send
+                    var data = {
+                        name: inputValue
+                    };
+
+                    // Send the data to the API
+                    $.ajax({
+                        url: 'https://3002-idx-tamilproject-1729776397254.cluster-e3wv6awer5h7kvayyfoein2u4a.cloudworkstations.dev/api/level1',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+                        success: function(response) {
+                            console.log("Data successfully sent to API");
+                            console.log(response);
+                        },
+                        error: function(error) {
+                            console.error("Error sending data to API");
+                            console.error(error);
+                        }
+                    });
+                } else {
+                    console.log("Tree node selected, no API call made");
+                }
+
+                console.log(inputValue); // Print to the console
+                console.log("Parent Node: " + currentParentNode); // Print current parent node
+                $('#routeNodeInput').val(''); // Clear the input
+            });
+        });
+    </script>
+</body>
+
+</html>
