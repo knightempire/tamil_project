@@ -6,6 +6,7 @@
     <title>Tamil project</title>
     <link href='https://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/dash.css">
     <style>
         /* Centering and layout adjustments */
@@ -16,26 +17,25 @@
             align-items: center;
             flex-direction: column;
         }
-        /* h1 {
-            margin-bottom: 10px;
-        } */
+        
+        .top-right-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
         
         .tree-options {
             text-decoration: underline;
             cursor: pointer;
             margin: 10px;
         }
-        /* Initially hide both trees */
         
         .tree {
             display: none;
-            /* margin: 20px auto; */
         }
         
         ul {
             list-style-type: none;
-            /* padding-left: 10px;
-            margin-left: 0; */
         }
         
         .nav ul ul {
@@ -55,18 +55,20 @@
         .expanded>ul {
             display: block;
         }
-        /* Ensure tree container is centered */
-        /* nav {
-            text-align: left;
-            margin-left: auto;
-            margin-right: auto;
-        } */
+        /* Custom styles for form alignment */
+        
+        .form-container {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            width: 300px;
+            /* Set a fixed width for the form */
+        }
     </style>
 </head>
 
 <body>
-    <h1>Root Node</h1>
-
+    <h1 class="text-center">Root Node</h1>
 
     <div class="main">
         <!-- Options to switch between trees -->
@@ -177,18 +179,43 @@
                 </ul>
             </nav>
         </div>
+    </div>
 
+    <!-- Button in the top-right corner -->
+    <button id="addRouteNode" class="top-right-button btn btn-primary">Add Route Node</button>
+
+    <!-- Dropdown area for input (initially hidden) -->
+    <div id="dropdownInput" class="dropdown-input form-container" style="display: none;">
+        <form id="routeNodeForm" class="bg-light p-3 border rounded">
+            <h5 class="mb-3">Add Route Node</h5>
+            <div class="form-group">
+                <label for="parentNodeInput">Parent Node:</label>
+                <input type="text" class="form-control" id="parentNodeInput" name="parentNodeInput" value="new parent" readonly>
+            </div>
+            <div class="form-group">
+                <label for="routeNodeInput">Enter Route Node:</label>
+                <input type="text" class="form-control" id="routeNodeInput" name="routeNodeInput" placeholder="Route Node" required>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-block">Submit</button>
+        </form>
     </div>
 
     <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
     <script>
         $(document).ready(function() {
-            // Initially expand only the Home node for Tree 1
-            $('#tree1 nav > ul > li').addClass('expanded');
+            let currentParentNode = "new parent"; // Default parent node name
 
             // Tree expansion/collapse logic for both trees
             $('nav a').on('click', function(e) {
                 e.preventDefault();
+                var nodeText = $(this).text(); // Get the text of the clicked node
+                console.log(nodeText); // Print the text to the console
+
+                // Update parent node input
+                currentParentNode = nodeText;
+                $('#parentNodeInput').val(currentParentNode);
+
                 var $nextUl = $(this).next('ul');
                 if ($nextUl.length) {
                     $(this).parent().toggleClass('expanded');
@@ -196,19 +223,41 @@
                 }
             });
 
-            // Toggle tree visibility based on selected option
+            // Toggle tree visibility based on selected option and reset expanded state
             $('#tree1Option').on('click', function() {
                 $('#tree1').show();
                 $('#tree2').hide();
+
+                // Reset tree 2's expanded state
+                $('#tree2 nav ul ul').slideUp();
+                $('#tree2 nav ul li').removeClass('expanded');
             });
 
             $('#tree2Option').on('click', function() {
                 $('#tree2').show();
                 $('#tree1').hide();
+
+                // Reset tree 1's expanded state
+                $('#tree1 nav ul ul').slideUp();
+                $('#tree1 nav ul li').removeClass('expanded');
             });
 
-            // Show Tree 1 by default on load
-            $('#tree1').show();
+            // Hide the tree by default on load
+            $('.tree').hide();
+
+            // Toggle dropdown input visibility when the button is clicked
+            $('#addRouteNode').on('click', function() {
+                $('#dropdownInput').toggle();
+            });
+
+            // Handle form submission
+            $('#routeNodeForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent the form from submitting normally
+                var inputValue = $('#routeNodeInput').val(); // Get the input value
+                console.log(inputValue); // Print to the console
+                console.log("Parent Node: " + currentParentNode); // Print current parent node
+                $('#routeNodeInput').val(''); // Clear the input
+            });
         });
     </script>
 </body>
