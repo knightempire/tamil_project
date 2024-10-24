@@ -5,93 +5,185 @@
     <meta charset="UTF-8">
     <title>Tamil project</title>
     <link href='https://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="wclassth=device-wclassth, initial-scale=1">
+    <link rel="icon" href="data:,">
 
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/dash.css">
 
 </head>
 
 <body>
-    <!-- partial:index.partial.html -->
-    <h1>Root nodde</h1>
-    <nav class="nav">
-        <ul>
-            <li>
-                <a href="#">Home</a>
-                <ul>
-                    <li>
-                        <a href="#">Lab</a>
-                        <ul>
-                            <li>
-                                <a href="#">Code</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">Html</a>
-                                        <ul>
-                                            <li>
-                                                <a href="#">Css</a>
-                                                <ul>
-                                                    <li>
-                                                        <a href="#">Jquery</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="#">Graph</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">Image</a>
-                                        <ul>
-                                            <li>
-                                                <a href="#">Design</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#">Blog</a>
-                        <ul>
-                            <li>
-                                <a href="#">Category</a>
-                                <ul>
-                                    <li>
-                                        <a href="#">Code</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Graph</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#">About</a>
-                        <ul>
-                            <li>
-                                <a href="#">Vcard</a>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Root Node</h1>
+            <button class="btn btn-primary">Add</button>
+        </div>
 
-                            </li>
-                            <li>
-                                <a href="#">Map</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
-    <!-- partial -->
-    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-    <script src='https://codepen.io/joellesenne/pen/pdMPdW.js'></script>
+        <div class="dislevel1 nav">
+            <ul class="nav-list">
+                <!-- List items will be dynamically inserted here -->
+            </ul>
+        </div>
+
+        <nav class="nav" style="width: 100%; height: auto;" id="root">
+            <ul>
+                <li class="1">
+                    <a href="#">Home</a>
+                    <ul>
+                        <li class="2">
+                            <a href="#">Lab</a>
+                            <ul>
+                                <li class="3">
+                                    <a href="#">Code</a>
+                                    <ul>
+                                        <li class="4">
+                                            <a href="#">Html</a>
+                                            <ul>
+                                                <li class="5">
+                                                    <a href="#">Css</a>
+                                                    <ul>
+                                                        <li class="6">
+                                                            <a href="#">Jquery</a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="3">
+                                    <a href="#">Graph</a>
+                                    <ul>
+                                        <li class="4">
+                                            <a href="#">Image</a>
+                                            <ul>
+                                                <li class="5">
+                                                    <a href="#">Design</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="2">
+                            <a href="#">Blog</a>
+                            <ul>
+                                <li class="3">
+                                    <a href="#">Category</a>
+                                    <ul>
+                                        <li class="4">
+                                            <a href="#">Code</a>
+                                        </li>
+                                        <li class="4">
+                                            <a href="#">Graph</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="2">
+                            <a href="#">About</a>
+                            <ul>
+                                <li class="3">
+                                    <a href="#">Vcard</a>
+                                </li>
+                                <li class="3">
+                                    <a href="#">Map</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul>
+                <li class="1">
+                    <a href="#">Dashboard</a>
+                    <ul>
+                        <li class="2">
+                            <a href="#">Workshop</a>
+                            <ul>
+                                <li class="3">
+                                    <a href="#">Scripts</a>
+                                    <ul>
+                                        <li class="4">
+                                            <a href="#">Markup</a>
+                                            <ul>
+                                                <li class="5">
+                                                    <a href="#">Styling</a>
+                                                    <ul>
+                                                        <li class="6">
+                                                            <a href="#">Frameworks</a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="3">
+                                    <a href="#">Charts</a>
+                                    <ul>
+                                        <li class="4">
+                                            <a href="#">Visuals</a>
+                                            <ul>
+                                                <li class="5">
+                                                    <a href="#">Artwork</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="2">
+                            <a href="#">Articles</a>
+                            <ul>
+                                <li class="3">
+                                    <a href="#">Topics</a>
+                                    <ul>
+                                        <li class="4">
+                                            <a href="#">Scripts</a>
+                                        </li>
+                                        <li class="4">
+                                            <a href="#">Charts</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="2">
+                            <a href="#">Profile</a>
+                            <ul>
+                                <li class="3">
+                                    <a href="#">Resume</a>
+                                </li>
+                                <li class="3">
+                                    <a href="#">Location</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
 
 
 </body>
+
+<script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script>
+    $(document).ready(function() {
+        $('.nav a').on('click', function(event) {
+            event.preventDefault();
+            const classes = $(this).parent().attr('class');
+            const value = $(this).text();
+            console.log('Class:', classes, 'Value:', value);
+        });
+    });
+</script>
 
 </html>
