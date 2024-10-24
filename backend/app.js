@@ -533,11 +533,85 @@ app.get('/api/dislevel1', async(req, res) => {
 });
 
 
+// Route for retrieving Level 2 entries based on a provided ID
+app.post('/api/dislevel2', async(req, res) => {
+    await retrieveLevel(req, res, 'level2');
+});
+
+// Route for retrieving Level 3 entries based on a provided ID
+app.post('/api/dislevel3', async(req, res) => {
+    await retrieveLevel(req, res, 'level3');
+});
+
+// Route for retrieving Level 4 entries based on a provided ID
+app.post('/api/dislevel4', async(req, res) => {
+    await retrieveLevel(req, res, 'level4');
+});
+
+// Route for retrieving Level 5 entries based on a provided ID
+app.post('/api/dislevel5', async(req, res) => {
+    await retrieveLevel(req, res, 'level5');
+});
+
+// Route for retrieving Level 6 entries based on a provided ID
+app.post('/api/dislevel6', async(req, res) => {
+    await retrieveLevel(req, res, 'level6');
+});
+
+// Route for retrieving Level 7 entries based on a provided ID
+app.post('/api/dislevel7', async(req, res) => {
+    await retrieveLevel(req, res, 'level7');
+});
+
+// Route for retrieving Level 8 entries based on a provided ID
+app.post('/api/dislevel8', async(req, res) => {
+    await retrieveLevel(req, res, 'level8');
+});
+
+// Route for retrieving Level 9 entries based on a provided ID
+app.post('/api/dislevel9', async(req, res) => {
+    await retrieveLevel(req, res, 'level9');
+});
+
+// Route for retrieving Level 10 entries based on a provided ID
+app.post('/api/dislevel10', async(req, res) => {
+    await retrieveLevel(req, res, 'level10');
+});
+
+// Helper function to retrieve entries from specified level
+async function retrieveLevel(req, res, level) {
+    try {
+        console.log(`API ${level.charAt(0).toUpperCase() + level.slice(1)} retrieval requested`);
+
+        // Get the id from the request body
+        const { id } = req.body;
+
+        // Check if id is provided
+        if (!id) {
+            return res.status(400).json({ error: 'ID is required' });
+        }
+
+        // Query to get entries from the specified level where p_id matches the provided id
+        const [rows] = await pool.execute(`SELECT * FROM ${level} WHERE p_id = ?`, [id]);
+
+        // Send response with entries from the specified level
+        res.json({ success: true, data: rows });
+    } catch (error) {
+        console.error(`Error during ${level.charAt(0).toUpperCase() + level.slice(1)} retrieval:`, error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+
 
 app.get('/test', (req, res) => {
     res.status(200).json({ message: "Welcome Tamil students" });
 });
 
+
+app.get('/', (req, res) => {
+    res.status(200).json({ message: "ப்ரோ ஐஸ் குக்கிங்" });
+});
 
 
 //port
