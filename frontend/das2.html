@@ -9,64 +9,70 @@
     <link rel="stylesheet" href="./css/dash.css">
     <style>
         /* Centering and layout adjustments */
-        
         .main {
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
-        /* h1 {
-            margin-bottom: 10px;
-        } */
-        
+
+        /* Button at the top-right corner */
+        .top-right-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        /* Dropdown input hidden initially */
+        .dropdown-input {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
         .tree-options {
             text-decoration: underline;
             cursor: pointer;
             margin: 10px;
         }
+
         /* Initially hide both trees */
-        
         .tree {
             display: none;
-            /* margin: 20px auto; */
         }
-        
+
         ul {
             list-style-type: none;
-            /* padding-left: 10px;
-            margin-left: 0; */
         }
-        
+
         .nav ul ul {
             display: none;
         }
-        
+
         .nav a {
             text-decoration: none;
             display: block;
             padding: 5px;
         }
-        
+
         .nav a:hover {
             background-color: #ddd;
         }
-        
-        .expanded>ul {
+
+        .expanded > ul {
             display: block;
         }
-        /* Ensure tree container is centered */
-        /* nav {
-            text-align: left;
-            margin-left: auto;
-            margin-right: auto;
-        } */
     </style>
 </head>
 
 <body>
     <h1>Root Node</h1>
-
 
     <div class="main">
         <!-- Options to switch between trees -->
@@ -74,7 +80,6 @@
             <span id="tree1Option" class="tree-options">Tree 1</span> |
             <span id="tree2Option" class="tree-options">Tree 2 (Example)</span>
         </div>
-
         <!-- Tree 1 -->
         <div id="tree1" class="tree">
             <nav class="nav">
@@ -177,17 +182,22 @@
                 </ul>
             </nav>
         </div>
+    </div>
 
+    <!-- Button in the top-right corner -->
+    <button id="addRouteNode" class="top-right-button">Add Route Node</button>
+
+    <!-- Dropdown area for input (initially hidden) -->
+    <div id="dropdownInput" class="dropdown-input">
+        <label for="routeNodeInput">Enter Route Node:</label>
+        <input type="text" id="routeNodeInput" name="routeNodeInput">
     </div>
 
     <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
     <script>
-        $(document).ready(function() {
-            // Initially expand only the Home node for Tree 1
-            $('#tree1 nav > ul > li').addClass('expanded');
-
+        $(document).ready(function () {
             // Tree expansion/collapse logic for both trees
-            $('nav a').on('click', function(e) {
+            $('nav a').on('click', function (e) {
                 e.preventDefault();
                 var $nextUl = $(this).next('ul');
                 if ($nextUl.length) {
@@ -196,19 +206,32 @@
                 }
             });
 
-            // Toggle tree visibility based on selected option
-            $('#tree1Option').on('click', function() {
+            // Toggle tree visibility based on selected option and reset expanded state
+            $('#tree1Option').on('click', function () {
                 $('#tree1').show();
                 $('#tree2').hide();
+
+                // Reset tree 2's expanded state
+                $('#tree2 nav ul ul').slideUp();
+                $('#tree2 nav ul li').removeClass('expanded');
             });
 
-            $('#tree2Option').on('click', function() {
+            $('#tree2Option').on('click', function () {
                 $('#tree2').show();
                 $('#tree1').hide();
+
+                // Reset tree 1's expanded state
+                $('#tree1 nav ul ul').slideUp();
+                $('#tree1 nav ul li').removeClass('expanded');
             });
 
-            // Show Tree 1 by default on load
-            $('#tree1').show();
+            // Hide the tree by default on load
+            $('.tree').hide();
+
+            // Toggle dropdown input visibility when the button is clicked
+            $('#addRouteNode').on('click', function () {
+                $('#dropdownInput').toggle();
+            });
         });
     </script>
 </body>
